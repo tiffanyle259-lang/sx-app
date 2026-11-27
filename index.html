@@ -1884,7 +1884,7 @@ function autoPanel(){
     ${q0==='granted'?`<button class="btn go" onclick="autoTick(true)">Cập nhật ngay</button>`:st.qlbh==='prompt'?`<button class="btn go" onclick="autoGrant()">Cho phép</button>`:`<button class="btn go" onclick="autoConnect('qlbh')">Nối file QLBH</button>`}</div>
   <div class="bh-task ${st.app==='granted'?'ok':'warn'}"><span class="tg">💾</span><div class="tx"><b>Tự lưu vào file app này ${pill(st.app)}</b><span>${st.app==='granted'?'Mọi thay đổi tự ghi vào file, không cần bấm Lưu.'+(st.lastSave?' Lần cuối '+new Date(st.lastSave).toLocaleTimeString('vi-VN'):''):'Nối file quan-ly-san-xuat.html này một lần để app tự lưu.'}</span></div>
     ${st.app==='granted'?'':st.app==='prompt'?`<button class="btn go" onclick="autoGrant()">Cho phép</button>`:`<button class="btn go" onclick="autoConnect('app')">Nối file app</button>`}</div>
-  ${window.__SX_LOADER_KEY?'':`<div class="bh-task ${(function(){try{return localStorage.getItem('sx-appver')==='2026-11-27-5'}catch(e){return false}})()?'ok':'warn'}"><span class="tg">📱</span><div class="tx"><b>App trên điện thoại</b><span>Điện thoại mở bản đã đẩy lên kho. Sửa app xong thì bấm đẩy để điện thoại có bản mới (chọn file quan-ly-san-xuat.html).</span></div><button class="btn go" onclick="sxUploadApp()">Đẩy lên điện thoại</button></div>`}
+  ${window.__SX_LOADER_KEY?'':`<div class="bh-task ${(function(){try{return localStorage.getItem('sx-appver')==='2026-11-27-6'}catch(e){return false}})()?'ok':'warn'}"><span class="tg">📱</span><div class="tx"><b>App trên điện thoại</b><span>Điện thoại mở bản đã đẩy lên kho. Sửa app xong thì bấm đẩy để điện thoại có bản mới (chọn file quan-ly-san-xuat.html).</span></div><button class="btn go" onclick="sxUploadApp()">Đẩy lên điện thoại</button></div>`}
   <div class="bh-task ok"><span class="tg">🛟</span><div class="tx"><b>Sao lưu tự động (${bk.length}/3 bản gần nhất)</b><span>${bk.length?bk.map((b,i)=>`<a href="#" onclick="autoRestoreBackup(${i});return false" style="color:#6B3F08;font-weight:700">${new Date(b.t).toLocaleString('vi-VN')}</a> (${esc(b.why)})`).join(' · '):'Chưa có bản sao lưu'}</span></div></div>
   <div class="bh-note">Lần đầu mỗi ngày Chrome có thể hỏi quyền truy cập file: chọn <b>"Cho phép trong mọi lần truy cập"</b> để app tự chạy cả ngày.</div></div>`;
 }
@@ -5376,7 +5376,7 @@ loadState();
 <script id="sx-sync">
 /* ===== Kho chung SX (noibobaocao4) — đồng bộ điện thoại ===== */
 (function(){
-  var URL_='https://script.google.com/macros/s/AKfycbwHGLF2TV2agyWYzBQLFIZrcCn_jJBYe3ZBB7YBFJ36NhB571YumewOXSPsIvmVBF4AIw/exec', KEY_=window.__SX_LOADER_KEY||'', APP_VER='2026-11-27-5';
+  var URL_='https://script.google.com/macros/s/AKfycbwHGLF2TV2agyWYzBQLFIZrcCn_jJBYe3ZBB7YBFJ36NhB571YumewOXSPsIvmVBF4AIw/exec', KEY_=window.__SX_LOADER_KEY||'', APP_VER='2026-11-27-6';
   var PHONE=!!window.__SX_LOADER_KEY, remoteAt=0, busy=false, pushT=null, st='';
   function badge(t,c){ try{ var el=document.getElementById('sxCloud'); if(!el){ var b=document.getElementById('fileDirtyBadge'); if(!b) return; el=document.createElement('span'); el.id='sxCloud'; el.style.cssText='margin-left:8px;font-weight:700;'; b.parentNode.insertBefore(el,b.nextSibling); if(PHONE) b.style.display='none'; } el.textContent=t; el.style.color=c||'#4B7A51'; }catch(e){} }
   function q(a){ return URL_+'?k='+encodeURIComponent(KEY_)+'&a='+a+'&_='+Date.now(); }
