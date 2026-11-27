@@ -6,7 +6,7 @@ window.__sxToggleView=function(){try{localStorage.setItem('sx-view',v==='pc'?'ph
 </script><script>(function(){try{if(!window.__SX_LOADER_KEY){var k='';try{k=localStorage.getItem('sxk')||''}catch(e){}
 if(!k){k=prompt('Nhập MÃ CÔNG TY (nhập 1 lần, máy sẽ nhớ):')||'';if(k){try{localStorage.setItem('sxk',k)}catch(e){}}}
 window.__SX_LOADER_KEY=k;window.__SX_GH=1;}}catch(e){}})();</script>
-
+<style id="ghphone">@media(max-width:700px){#hdrMonth{min-width:0}.hdr-gear{width:32px!important;height:32px!important;font-size:16px!important;margin-right:4px!important}}</style>
 <meta charset="UTF-8">
 <title>APP SẢN XUẤT</title>
 <style>
@@ -1888,7 +1888,7 @@ function autoPanel(){
     ${q0==='granted'?`<button class="btn go" onclick="autoTick(true)">Cập nhật ngay</button>`:st.qlbh==='prompt'?`<button class="btn go" onclick="autoGrant()">Cho phép</button>`:`<button class="btn go" onclick="autoConnect('qlbh')">Nối file QLBH</button>`}</div>
   <div class="bh-task ${st.app==='granted'?'ok':'warn'}"><span class="tg">💾</span><div class="tx"><b>Tự lưu vào file app này ${pill(st.app)}</b><span>${st.app==='granted'?'Mọi thay đổi tự ghi vào file, không cần bấm Lưu.'+(st.lastSave?' Lần cuối '+new Date(st.lastSave).toLocaleTimeString('vi-VN'):''):'Nối file quan-ly-san-xuat.html này một lần để app tự lưu.'}</span></div>
     ${st.app==='granted'?'':st.app==='prompt'?`<button class="btn go" onclick="autoGrant()">Cho phép</button>`:`<button class="btn go" onclick="autoConnect('app')">Nối file app</button>`}</div>
-  ${window.__SX_LOADER_KEY?'':`<div class="bh-task ${(function(){try{return localStorage.getItem('sx-appver')==='2026-11-27-15'}catch(e){return false}})()?'ok':'warn'}"><span class="tg">📱</span><div class="tx"><b>App trên điện thoại</b><span>Điện thoại mở bản đã đẩy lên kho. Sửa app xong thì bấm đẩy để điện thoại có bản mới (chọn file quan-ly-san-xuat.html).</span></div><button class="btn go" onclick="sxUploadApp()">Đẩy lên điện thoại</button></div>`}
+  ${window.__SX_LOADER_KEY?'':`<div class="bh-task ${(function(){try{return localStorage.getItem('sx-appver')==='2026-11-27-16'}catch(e){return false}})()?'ok':'warn'}"><span class="tg">📱</span><div class="tx"><b>App trên điện thoại</b><span>Điện thoại mở bản đã đẩy lên kho. Sửa app xong thì bấm đẩy để điện thoại có bản mới (chọn file quan-ly-san-xuat.html).</span></div><button class="btn go" onclick="sxUploadApp()">Đẩy lên điện thoại</button></div>`}
   <div class="bh-task ok"><span class="tg">🛟</span><div class="tx"><b>Sao lưu tự động (${bk.length}/3 bản gần nhất)</b><span>${bk.length?bk.map((b,i)=>`<a href="#" onclick="autoRestoreBackup(${i});return false" style="color:#6B3F08;font-weight:700">${new Date(b.t).toLocaleString('vi-VN')}</a> (${esc(b.why)})`).join(' · '):'Chưa có bản sao lưu'}</span></div></div>
   <div class="bh-note">Lần đầu mỗi ngày Chrome có thể hỏi quyền truy cập file: chọn <b>"Cho phép trong mọi lần truy cập"</b> để app tự chạy cả ngày.</div></div>`;
 }
@@ -1918,7 +1918,7 @@ function hbHeadMerge(){
   let hm=document.getElementById('hdrMonth');
   const hr=document.querySelector('.app-header .header-row');
   if(!hm && hr){ hm=document.createElement('div'); hm.id='hdrMonth'; hm.style.cssText='margin-left:auto;display:flex;align-items:center'; hr.appendChild(hm); }
-  if(hm){ hm.innerHTML='<button type="button" title="Chọn giao diện: điện thoại / máy tính" onclick="window.__sxToggleView()" style="border:0;border-radius:12px;padding:7px 12px;margin-right:8px;font:800 14px system-ui,sans-serif;color:#1a1a1a;background:linear-gradient(180deg,#FFE9A8,#F2B84B);box-shadow:0 4px 0 #b9852a,0 6px 10px rgba(0,0,0,.2)">'+(window.__sxView==='pc'?'📱 ĐT':'💻 PC')+'</button><button type="button" class="hdr-gear" title="Công cụ: sao lưu, dán dữ liệu" onclick="currentTab=\'import\'; navOpen=\'g3\'; render();">⚙</button>'+renderMonthSelector(); const s2=hm.querySelector('.month-selector'); if(s2) s2.style.margin='0'; }
+  if(hm){ hm.innerHTML=(window.__SX_LOADER_KEY?'<button type="button" title="Làm mới dữ liệu và bản app mới" onclick="window.sxDoRefresh&&window.sxDoRefresh()" style="border:0;border-radius:12px;padding:5px 7px;margin-right:4px;font:800 15px system-ui,sans-serif;color:#3b4a0e;background:linear-gradient(180deg,#e3f0a0,#b9d34a);box-shadow:0 4px 0 #7d9022,0 6px 10px rgba(0,0,0,.2)">🔄</button>':'')+'<button type="button" title="Chọn giao diện: điện thoại / máy tính" onclick="window.__sxToggleView()" style="border:0;border-radius:12px;padding:5px 7px;margin-right:4px;font:800 15px system-ui,sans-serif;color:#1a1a1a;background:linear-gradient(180deg,#FFE9A8,#F2B84B);box-shadow:0 4px 0 #b9852a,0 6px 10px rgba(0,0,0,.2)">'+(window.__sxView==='pc'?'📱':'💻')+'</button><button type="button" class="hdr-gear" title="Công cụ: sao lưu, dán dữ liệu" onclick="currentTab=\'import\'; navOpen=\'g3\'; render();">⚙</button>'+renderMonthSelector(); const s2=hm.querySelector('.month-selector'); if(s2) s2.style.margin='0'; }
   { const ah=document.querySelector('.app-header'); if(ah){ let r=document.getElementById('hdrRight'); if(!r){ r=document.createElement('div'); r.id='hdrRight'; ah.appendChild(r); } ['fileDirtyBadge','sxCloud','autoBadge'].forEach(id=>{ const e=document.getElementById(id); if(e&&e.parentNode!==r) r.appendChild(e); }); } }
   const first=heads[0];
   if(!first) return;
@@ -5421,7 +5421,7 @@ loadState();
 <script id="sx-sync">
 /* ===== Kho chung SX (noibobaocao4) — đồng bộ điện thoại ===== */
 (function(){
-  var URL_='https://script.google.com/macros/s/AKfycbwHGLF2TV2agyWYzBQLFIZrcCn_jJBYe3ZBB7YBFJ36NhB571YumewOXSPsIvmVBF4AIw/exec', KEY_=window.__SX_LOADER_KEY||'', APP_VER='2026-11-27-15';
+  var URL_='https://script.google.com/macros/s/AKfycbwHGLF2TV2agyWYzBQLFIZrcCn_jJBYe3ZBB7YBFJ36NhB571YumewOXSPsIvmVBF4AIw/exec', KEY_=window.__SX_LOADER_KEY||'', APP_VER='2026-11-27-16';
   var PHONE=!!window.__SX_LOADER_KEY, remoteAt=0, busy=false, pushT=null, st='';
   function badge(t,c){ try{ var el=document.getElementById('sxCloud'); if(!el){ var b=document.getElementById('fileDirtyBadge'); if(!b) return; el=document.createElement('span'); el.id='sxCloud'; el.style.cssText='margin-left:8px;font-weight:700;'; b.parentNode.insertBefore(el,b.nextSibling); if(PHONE) b.style.display='none'; } el.textContent=t; el.style.color=c||'#4B7A51'; }catch(e){} }
   function q(a){ return URL_+'?k='+encodeURIComponent(KEY_)+'&a='+a+'&_='+Date.now(); }
@@ -5491,11 +5491,8 @@ loadState();
       if(html.indexOf("APP_VER='"+APP_VER+"'")>=0) return res(false);
       window.__SX_LOADER_KEY=KEY_; document.open(); document.write(html); document.close(); res(true); }catch(e){ res(false); } }).withFailureHandler(function(){ res(false); }).getApp(KEY_); }catch(e){ res(false); } }); }
   window.sxPull=pull; window.sxPush=push;
-  /* điện thoại: nút làm mới dữ liệu tại chỗ (không tải lại trang nên không phải nhập lại mã) */
-  if(PHONE){ setTimeout(function(){ try{ if(document.getElementById('sxRefreshBtn')) return; var b=document.createElement('button'); b.id='sxRefreshBtn'; b.type='button'; b.textContent='🔄 Làm mới';
-    b.style.cssText='position:fixed;right:14px;bottom:84px;z-index:9999;padding:11px 16px;border:0;border-radius:16px;background:linear-gradient(180deg,#d8ea8a,#b9d34a);color:#3b4a0e;font:800 15px system-ui,sans-serif;box-shadow:0 5px 0 #7d9022,0 8px 14px rgba(0,0,0,.25)';
-    b.onclick=async function(){ b.textContent='⏳ Đang tải...'; try{ if(await reloadApp()) return; var ok=await pull(true); try{ render(); }catch(e){} b.textContent=ok?'✅ Đã làm mới':'⚠ Chưa có dữ liệu mới'; }catch(e){ b.textContent='⚠ Lỗi mạng'; } setTimeout(function(){ b.textContent='🔄 Làm mới'; },2500); };
-    document.body.appendChild(b); }catch(e){} },2500); }
+  /* điện thoại: nút 🔄 Làm mới nằm trên thanh menu (cạnh ⚙), không tải lại trang nên không phải nhập lại mã */
+  window.sxDoRefresh=async function(){ try{ toast('⏳ Đang làm mới...'); if(await reloadApp()) return; var ok=await pull(true); try{ render(); }catch(e){} toast(ok?'✅ Đã làm mới':'⚠ Chưa có dữ liệu mới'); }catch(e){ toast('⚠ Lỗi mạng'); } };
   /* tự đẩy app khi đã nối file và có phiên bản mới */
   async function autoApp(){ if(PHONE) return; try{ if(localStorage.getItem('sx-appver')===APP_VER) return; var h=(typeof autoState!=='undefined'&&autoState.ah)||await idbGet('app'); if(!h) return; if(await autoPerm(h,'read')!=='granted') return; await uploadApp(h); }catch(e){} }
   async function start(){ try{ passw(); }catch(e){ badge('☁ Chưa nhập mã bảo mật','#B0503D'); return; } try{ if(await pull(false)) badge('☁ Đã cập nhật từ kho'); else await push(); }catch(e){ badge('☁ Chưa đồng bộ','#B0503D'); } autoApp(); }
