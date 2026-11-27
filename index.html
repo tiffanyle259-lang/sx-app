@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
+<head><script>(function(){try{if(!window.__SX_LOADER_KEY){var k='';try{k=localStorage.getItem('sxk')||''}catch(e){}
+if(!k){k=prompt('Nhập MÃ CÔNG TY (nhập 1 lần, máy sẽ nhớ):')||'';if(k){try{localStorage.setItem('sxk',k)}catch(e){}}}
+window.__SX_LOADER_KEY=k;window.__SX_GH=1;}}catch(e){}})();</script>
+
 <meta charset="UTF-8">
 <title>APP SẢN XUẤT</title>
 <style>
@@ -5434,7 +5437,7 @@ loadState();
     }catch(e){ toast('Đẩy app lỗi: '+(e&&e.message),'bad'); }
   };
   /* điện thoại: lấy bản app mới từ kho ngay tại chỗ (không tải lại trang => không phải nhập lại mã) */
-  function reloadApp(){ return new Promise(function(res){ try{ if(!(window.google&&google.script&&google.script.run)) return res(false);
+  function reloadApp(){ return new Promise(function(res){ try{ if(window.__SX_GH){ fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(h){ if(h.indexOf("APP_VER='"+APP_VER+"'")>=0) return res(false); location.replace(location.pathname+'?v='+Date.now()); res(true); }).catch(function(){res(false)}); return; } if(!(window.google&&google.script&&google.script.run)) return res(false);
     google.script.run.withSuccessHandler(async function(b64){ try{ if(!b64) return res(false); var bin=atob(b64),u=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i);
       var ds=new DecompressionStream('gzip'),w=ds.writable.getWriter(); w.write(u); w.close(); var html=await new Response(ds.readable).text();
       if(html.indexOf("APP_VER='"+APP_VER+"'")>=0) return res(false);
