@@ -2,9 +2,8 @@
 <html lang="vi">
 <head><script>(function(){var v='';try{v=localStorage.getItem('sx-view')||''}catch(e){}
 document.write('<meta name="viewport" content="'+(v==='pc'?'width=1100':'width=device-width,initial-scale=1')+'">');
-window.addEventListener('DOMContentLoaded',function(){setTimeout(function(){try{var b=document.createElement('button');b.type='button';b.textContent=(v==='pc'?'📱':'💻');b.title=(v==='pc'?'Chuyển giao diện điện thoại':'Chuyển giao diện máy tính');
-b.style.cssText='position:fixed;left:12px;bottom:84px;z-index:9999;width:52px;height:52px;border:0;border-radius:16px;font-size:26px;background:linear-gradient(180deg,#fff,#e3dccb);box-shadow:0 5px 0 #b9ae93,0 8px 14px rgba(0,0,0,.25)';
-b.onclick=function(){try{localStorage.setItem('sx-view',v==='pc'?'phone':'pc')}catch(e){}location.reload()};document.body.appendChild(b)}catch(e){}},1500)})})();</script><script>(function(){try{if(!window.__SX_LOADER_KEY){var k='';try{k=localStorage.getItem('sxk')||''}catch(e){}
+window.__sxToggleView=function(){try{localStorage.setItem('sx-view',v==='pc'?'phone':'pc')}catch(e){}location.reload()};window.__sxView=v;})();
+</script><script>(function(){try{if(!window.__SX_LOADER_KEY){var k='';try{k=localStorage.getItem('sxk')||''}catch(e){}
 if(!k){k=prompt('Nhập MÃ CÔNG TY (nhập 1 lần, máy sẽ nhớ):')||'';if(k){try{localStorage.setItem('sxk',k)}catch(e){}}}
 window.__SX_LOADER_KEY=k;window.__SX_GH=1;}}catch(e){}})();</script>
 
@@ -1915,7 +1914,7 @@ function hbHeadMerge(){
   let hm=document.getElementById('hdrMonth');
   const hr=document.querySelector('.app-header .header-row');
   if(!hm && hr){ hm=document.createElement('div'); hm.id='hdrMonth'; hm.style.cssText='margin-left:auto;display:flex;align-items:center'; hr.appendChild(hm); }
-  if(hm){ hm.innerHTML='<button type="button" class="hdr-gear" title="Công cụ: sao lưu, dán dữ liệu" onclick="currentTab=\'import\'; navOpen=\'g3\'; render();">⚙</button>'+renderMonthSelector(); const s2=hm.querySelector('.month-selector'); if(s2) s2.style.margin='0'; }
+  if(hm){ hm.innerHTML='<button type="button" title="Chọn giao diện: điện thoại / máy tính" onclick="window.__sxToggleView()" style="border:0;border-radius:12px;padding:7px 12px;margin-right:8px;font:800 14px system-ui,sans-serif;color:#1a1a1a;background:linear-gradient(180deg,#FFE9A8,#F2B84B);box-shadow:0 4px 0 #b9852a,0 6px 10px rgba(0,0,0,.2)">'+(window.__sxView==='pc'?'📱 ĐT':'💻 PC')+'</button><button type="button" class="hdr-gear" title="Công cụ: sao lưu, dán dữ liệu" onclick="currentTab=\'import\'; navOpen=\'g3\'; render();">⚙</button>'+renderMonthSelector(); const s2=hm.querySelector('.month-selector'); if(s2) s2.style.margin='0'; }
   { const ah=document.querySelector('.app-header'); if(ah){ let r=document.getElementById('hdrRight'); if(!r){ r=document.createElement('div'); r.id='hdrRight'; ah.appendChild(r); } ['fileDirtyBadge','sxCloud','autoBadge'].forEach(id=>{ const e=document.getElementById(id); if(e&&e.parentNode!==r) r.appendChild(e); }); } }
   const first=heads[0];
   if(!first) return;
