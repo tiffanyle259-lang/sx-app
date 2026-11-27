@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head><meta name="viewport" content="width=device-width,initial-scale=1"><script>(function(){try{if(!window.__SX_LOADER_KEY){var k='';try{k=localStorage.getItem('sxk')||''}catch(e){}
+<head><script>(function(){var v='';try{v=localStorage.getItem('sx-view')||''}catch(e){}
+document.write('<meta name="viewport" content="'+(v==='pc'?'width=1100':'width=device-width,initial-scale=1')+'">');
+window.addEventListener('DOMContentLoaded',function(){setTimeout(function(){try{var b=document.createElement('button');b.type='button';b.textContent=(v==='pc'?'📱':'💻');b.title=(v==='pc'?'Chuyển giao diện điện thoại':'Chuyển giao diện máy tính');
+b.style.cssText='position:fixed;left:12px;bottom:84px;z-index:9999;width:52px;height:52px;border:0;border-radius:16px;font-size:26px;background:linear-gradient(180deg,#fff,#e3dccb);box-shadow:0 5px 0 #b9ae93,0 8px 14px rgba(0,0,0,.25)';
+b.onclick=function(){try{localStorage.setItem('sx-view',v==='pc'?'phone':'pc')}catch(e){}location.reload()};document.body.appendChild(b)}catch(e){}},1500)})})();</script><script>(function(){try{if(!window.__SX_LOADER_KEY){var k='';try{k=localStorage.getItem('sxk')||''}catch(e){}
 if(!k){k=prompt('Nhập MÃ CÔNG TY (nhập 1 lần, máy sẽ nhớ):')||'';if(k){try{localStorage.setItem('sxk',k)}catch(e){}}}
 window.__SX_LOADER_KEY=k;window.__SX_GH=1;}}catch(e){}})();</script>
 
