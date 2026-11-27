@@ -1884,7 +1884,7 @@ function autoPanel(){
     ${q0==='granted'?`<button class="btn go" onclick="autoTick(true)">Cập nhật ngay</button>`:st.qlbh==='prompt'?`<button class="btn go" onclick="autoGrant()">Cho phép</button>`:`<button class="btn go" onclick="autoConnect('qlbh')">Nối file QLBH</button>`}</div>
   <div class="bh-task ${st.app==='granted'?'ok':'warn'}"><span class="tg">💾</span><div class="tx"><b>Tự lưu vào file app này ${pill(st.app)}</b><span>${st.app==='granted'?'Mọi thay đổi tự ghi vào file, không cần bấm Lưu.'+(st.lastSave?' Lần cuối '+new Date(st.lastSave).toLocaleTimeString('vi-VN'):''):'Nối file quan-ly-san-xuat.html này một lần để app tự lưu.'}</span></div>
     ${st.app==='granted'?'':st.app==='prompt'?`<button class="btn go" onclick="autoGrant()">Cho phép</button>`:`<button class="btn go" onclick="autoConnect('app')">Nối file app</button>`}</div>
-  ${window.__SX_LOADER_KEY?'':`<div class="bh-task ${(function(){try{return localStorage.getItem('sx-appver')==='2026-11-27-9'}catch(e){return false}})()?'ok':'warn'}"><span class="tg">📱</span><div class="tx"><b>App trên điện thoại</b><span>Điện thoại mở bản đã đẩy lên kho. Sửa app xong thì bấm đẩy để điện thoại có bản mới (chọn file quan-ly-san-xuat.html).</span></div><button class="btn go" onclick="sxUploadApp()">Đẩy lên điện thoại</button></div>`}
+  ${window.__SX_LOADER_KEY?'':`<div class="bh-task ${(function(){try{return localStorage.getItem('sx-appver')==='2026-11-27-10'}catch(e){return false}})()?'ok':'warn'}"><span class="tg">📱</span><div class="tx"><b>App trên điện thoại</b><span>Điện thoại mở bản đã đẩy lên kho. Sửa app xong thì bấm đẩy để điện thoại có bản mới (chọn file quan-ly-san-xuat.html).</span></div><button class="btn go" onclick="sxUploadApp()">Đẩy lên điện thoại</button></div>`}
   <div class="bh-task ok"><span class="tg">🛟</span><div class="tx"><b>Sao lưu tự động (${bk.length}/3 bản gần nhất)</b><span>${bk.length?bk.map((b,i)=>`<a href="#" onclick="autoRestoreBackup(${i});return false" style="color:#6B3F08;font-weight:700">${new Date(b.t).toLocaleString('vi-VN')}</a> (${esc(b.why)})`).join(' · '):'Chưa có bản sao lưu'}</span></div></div>
   <div class="bh-note">Lần đầu mỗi ngày Chrome có thể hỏi quyền truy cập file: chọn <b>"Cho phép trong mọi lần truy cập"</b> để app tự chạy cả ngày.</div></div>`;
 }
@@ -2380,6 +2380,12 @@ function renderOrderDetailRow(order, colspan){
   const pend=orderPending(order), wmap=order.weighed||{};
   const wcell=t=>pend?`<td style="text-align:center"><input type="checkbox" style="width:20px;height:20px;cursor:pointer" ${wmap[t.id]?'checked':''} onchange="toggleWeighed('${order.id}','${t.id}',this.checked)" title="Tick khi đã cân xong NVL này"></td>`:'';
   const lines = state.nvlTx.filter(t=>t.orderId===order.id && t.type==='out');
+  const stdMap={}; (state.bom[order.productId]||[]).forEach(l=>{ stdMap[l.materialId]=l.qty*Number(order.qty||0); });
+  const isDev=t=>{ if(t.source!=='production') return false; const sd=stdMap[t.materialId]; return sd===undefined || Math.abs(Number(t.qty||0)-sd)>0.05; };
+  const devHtml=t=>{ if(t.source!=='production') return ''; const sd=stdMap[t.materialId]; const dv=isDev(t); if(!dv && !t.reason) return '';
+    const df=sd===undefined?null:Number(t.qty||0)-sd;
+    const a=dv?(sd===undefined?'ngoài định mức chuẩn (thêm cho lô này)':'chuẩn '+fmt(Math.round(sd*10)/10)+' · <b>'+(df>0?'+':'−')+fmt(Math.round(Math.abs(df)*10)/10)+'</b>'):'';
+    return '<div style="font-size:11px;line-height:1.3;margin-top:4px;text-align:right;white-space:normal;color:#8a5200">'+a+(t.reason?(a?' · ':'')+'<i>'+esc(t.reason)+'</i>':'')+'</div>'; };
   const ingredientLines = state.productTx.filter(t=>t.orderId===order.id && t.type==='out' && t.source==='recycle_input');
   let totalCost = 0;
   const editingDetail = editing.orderDetailTx;
@@ -2397,7 +2403,7 @@ function renderOrderDetailRow(order, colspan){
     const stock = openingStock(nvlTxForCheck, 'materialId', t.materialId, asOfExclusive);
     if(editingDetail && editingDetail.kind==='nvl' && editingDetail.id===t.id){
       return `<tr>${pend?'<td></td>':''}
-        <td>${esc(materialName(t.materialId))}${isExtra?' <span style="font-size:10px;color:var(--muted)">(phát sinh thêm)</span>':''}</td>
+        <td>${isExtra?esc(materialName(t.materialId))+' <span style="font-size:10px;color:var(--muted)">(phát sinh thêm)</span>':`<select id="orderDetailMatEdit_${t.id}" style="width:100%">${state.materials.filter(m=>m.id===t.materialId||!lines.some(x=>x.materialId===m.id)).map(m=>`<option value="${m.id}" ${m.id===t.materialId?'selected':''}>${esc(m.name)}</option>`).join('')}</select>`}<input id="orderDetailReasonEdit_${t.id}" type="text" value="${esc(t.reason||'')}" placeholder="Lý do (VD: thay D2 bằng M2)" style="width:100%;margin-top:4px;font-size:12px"></td>
         <td class="num"><input id="orderDetailQtyEdit_${t.id}" type="text" value="${fmt(t.qty)}" style="width:90px;text-align:right"></td>
         <td class="num">${fmt(price)}</td>
         <td class="num">${fmt(t.qty*price)}</td>
@@ -2407,13 +2413,13 @@ function renderOrderDetailRow(order, colspan){
     }
     const cost = Number(t.qty||0) * price;
     totalCost += cost;
-    return `<tr${pend&&wmap[t.id]?' style="background:#E8F3D6"':''}>${wcell(t)}
+    return `<tr style="${pend&&wmap[t.id]?'background:#E8F3D6':(isDev(t)?'background:#FFF3D6':'')}">${wcell(t)}
       ${pend?`<td style="padding:7px 8px 11px"><span style="display:block;padding:7px 8px;border-radius:12px;background:linear-gradient(180deg,#DDF7F0,#92DCCB);border:1px solid #6FC7B4;box-shadow:0 4px 0 #4FA896,0 7px 10px rgba(20,90,80,.22);font-size:19px;font-weight:900;color:#000;text-align:center;letter-spacing:.3px">${esc(materialName(t.materialId))}</span>${isExtra?'<div style="font-size:10px;color:var(--muted);text-align:center;margin-top:4px">(phát sinh thêm)</div>':''}${estimatedBadge(t)}</td>`:`<td>${esc(materialName(t.materialId))}${isExtra?' <span style="font-size:10px;color:var(--muted)">(phát sinh thêm)</span>':''}${estimatedBadge(t)}</td>`}
-      ${pend?`<td class="num" style="padding:7px 8px 11px;white-space:nowrap" title="Khối lượng cần cân (làm tròn 0,1 kg; số thật ${fmt(t.qty)})"><span style="display:block;padding:7px 12px;border-radius:12px;background:linear-gradient(180deg,#E0EEFF,#9DC5F6);border:1px solid #7AA9E6;box-shadow:0 4px 0 #5B88C4,0 7px 10px rgba(30,60,120,.22);font-size:19px;font-weight:900;color:#000;letter-spacing:.3px;text-align:center">${fmt(Math.round(Number(t.qty||0)*10)/10)} ${esc(materialUnit(t.materialId))}</span></td>`:`<td class="num">${fmt(t.qty)} ${esc(materialUnit(t.materialId))}</td>`}
+      ${pend?`<td class="num" style="padding:7px 8px 11px;white-space:nowrap" title="Khối lượng cần cân (làm tròn 0,1 kg; số thật ${fmt(t.qty)})"><span style="display:block;padding:7px 12px;border-radius:12px;background:linear-gradient(180deg,#E0EEFF,#9DC5F6);border:1px solid #7AA9E6;box-shadow:0 4px 0 #5B88C4,0 7px 10px rgba(30,60,120,.22);font-size:19px;font-weight:900;color:#000;letter-spacing:.3px;text-align:center">${fmt(Math.round(Number(t.qty||0)*10)/10)} ${esc(materialUnit(t.materialId))}</span>${devHtml(t)}</td>`:`<td class="num">${fmt(t.qty)} ${esc(materialUnit(t.materialId))}${devHtml(t)}</td>`}
       <td class="num">${fmt(price)}</td>
       <td class="num">${fmt(cost)}</td>
       ${stockCellHtml(stock, t.qty, materialUnit(t.materialId))}
-      <td class="num row-actions">${isOrderLocked(order.id)?'':`<button class="btn-edit" onclick="editing.orderDetailTx={kind:'nvl',id:'${t.id}'}; render();" title="Sửa số lượng thực xuất">✎</button>${isExtra?`<button class="btn-del" onclick="deleteOrderDetailTx('nvl','${t.id}')" title="Xoá">✕</button>`:''}`}</td>
+      <td class="num row-actions">${isOrderLocked(order.id)?'':`<button class="btn-edit" onclick="editing.orderDetailTx={kind:'nvl',id:'${t.id}'}; render();" title="Sửa NVL / số lượng / lý do cho lô này">✎</button><button class="btn-del" onclick="deleteOrderDetailTx('nvl','${t.id}')" title="Bỏ NVL này khỏi lô">✕</button>`}</td>
     </tr>`;
   }).join('');
   const ingredientRowsHtml = ingredientLines.map(t=>{
@@ -2440,7 +2446,17 @@ function renderOrderDetailRow(order, colspan){
       <td class="num row-actions">${isOrderLocked(order.id)?'':`<button class="btn-edit" onclick="editing.orderDetailTx={kind:'product',id:'${t.id}'}; render();" title="Sửa">✎</button><button class="btn-del" onclick="deleteOrderDetailTx('product','${t.id}')" title="Xoá">✕</button>`}</td>
     </tr>`;
   }).join('');
-  const bodyHtml = (rowsHtml+ingredientRowsHtml) || `<tr class="empty-row"><td colspan="${pend?8:7}">Sản phẩm này chưa có định mức khi tạo lệnh — không có NVL nào bị trừ.</td></tr>`;
+  const missStd=Object.keys(stdMap).filter(mid=>!lines.some(x=>x.materialId===mid));
+  const addHtml = isOrderLocked(order.id)?'':`<tr><td colspan="${pend?8:7}" style="background:#EEF6EA;padding:10px 12px">
+      ${missStd.length?`<div style="font-size:12px;margin-bottom:8px;color:#8a5200">Chuẩn có, lô này đang bỏ: ${missStd.map(mid=>`<button type="button" class="btn" style="padding:3px 9px;font-size:12px;margin:2px" onclick="addOrderNvlLine('${order.id}','${mid}',${Math.round(stdMap[mid]*1000)/1000})">＋ ${esc(materialName(mid))} ${fmt(Math.round(stdMap[mid]*10)/10)} kg</button>`).join('')}</div>`:''}
+      <b style="font-size:13px">＋ Thêm / thay NVL cho lô này:</b>
+      <select id="ordAddMat_${order.id}" style="margin:0 6px">${state.materials.filter(m=>!lines.some(x=>x.materialId===m.id)).map(m=>`<option value="${m.id}">${esc(m.name)}</option>`).join('')}</select>
+      <input id="ordAddQty_${order.id}" type="text" placeholder="kg" style="width:80px;text-align:right">
+      <input id="ordAddWhy_${order.id}" type="text" placeholder="Lý do (không bắt buộc)" style="width:200px;margin:0 6px">
+      <button type="button" class="btn go" onclick="addOrderNvlLine('${order.id}')">Thêm vào lô</button>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Chỉ áp dụng cho lô này (ngày ${esc(order.date||'')}). Công thức chuẩn không đổi. Để thay NVL: bấm ✎ ở dòng cũ chọn NVL khác, hoặc ✕ bỏ rồi thêm NVL mới.</div>
+    </td></tr>`;
+  const bodyHtml = ((rowsHtml+ingredientRowsHtml) ? rowsHtml+ingredientRowsHtml+addHtml : addHtml) || `<tr class="empty-row"><td colspan="${pend?8:7}">Sản phẩm này chưa có định mức khi tạo lệnh — không có NVL nào bị trừ.</td></tr>`;
   return `<tr>
     <td colspan="${colspan}" style="background:#FAF7EF;padding:12px 16px">
       <div style="font-weight:600;margin-bottom:6px">Chi tiết NVL/SP đã xuất cho lệnh này (SX ${fmt(order.qty)} ${esc(productUnit(order.productId))} ${esc(productName(order.productId))}):</div>
@@ -2462,15 +2478,31 @@ function saveOrderDetailTxQty(kind, txId){
   if(isNaN(qty) || qty<=0){ alert('Số lượng không hợp lệ.'); return; }
   const list = kind==='nvl' ? state.nvlTx : state.productTx;
   const t = list.find(x=>x.id===txId);
-  if(t) t.qty = qty;
+  if(t){ t.qty = qty;
+    if(kind==='nvl'){ const ms=document.getElementById('orderDetailMatEdit_'+txId), rs=document.getElementById('orderDetailReasonEdit_'+txId);
+      if(ms && ms.value && ms.value!==t.materialId){ if(state.nvlTx.some(x=>x.orderId===t.orderId && x.type==='out' && x.id!==t.id && x.materialId===ms.value)){ alert('NVL này đã có trong lô.'); return; } t.materialId=ms.value; }
+      if(rs) t.reason=rs.value.trim();
+      const od=state.orders.find(o=>o.id===t.orderId); if(od) od.custom=true; } }
   editing.orderDetailTx = null;
   saveState(); render();
+}
+function addOrderNvlLine(orderId, matId, qtyIn){
+  const od=state.orders.find(o=>o.id===orderId); if(!od) return;
+  if(isOrderLocked(orderId)){ alert('Lệnh này đã chốt, không sửa được.'); return; }
+  let mid=matId, qty=qtyIn, why='';
+  if(!mid){ const ms=document.getElementById('ordAddMat_'+orderId), qs=document.getElementById('ordAddQty_'+orderId), ws=document.getElementById('ordAddWhy_'+orderId);
+    mid=ms&&ms.value; qty=qs?parseVNNumber(qs.value):NaN; why=ws?ws.value.trim():''; }
+  if(!mid){ alert('Chọn NVL.'); return; }
+  if(isNaN(qty)||qty<=0){ alert('Nhập số kg hợp lệ.'); return; }
+  if(state.nvlTx.some(x=>x.orderId===orderId && x.type==='out' && x.materialId===mid)){ alert('NVL này đã có trong lô.'); return; }
+  state.nvlTx.push({id:uid(), materialId:mid, type:'out', qty, date:od.date, note:'', reason:why||(matId?'Thêm lại theo công thức chuẩn':''), source:'production', orderId});
+  od.custom=true; saveState(); render();
 }
 function deleteOrderDetailTx(kind, txId){
   const lockCheck = (kind==='nvl' ? state.nvlTx : state.productTx).find(x=>x.id===txId);
   if(lockCheck && isOrderLocked(lockCheck.orderId)){ alert('Lệnh này đã chốt, không xoá được.'); return; }
   if(!confirm('Xoá dòng này khỏi lệnh sản xuất?')) return;
-  if(kind==='nvl') state.nvlTx = state.nvlTx.filter(t=>t.id!==txId);
+  if(kind==='nvl'){ const od0=state.orders.find(o=>o.id===lockCheck.orderId); if(od0) od0.custom=true; state.nvlTx = state.nvlTx.filter(t=>t.id!==txId); }
   else state.productTx = state.productTx.filter(t=>t.id!==txId);
   if(editing.orderDetailTx && editing.orderDetailTx.id===txId) editing.orderDetailTx = null;
   saveState(); render();
@@ -4100,9 +4132,11 @@ function addOrder(month){
   let preservedProductionNotes = {};
   let preservedExtraNotes = {};
   let preservedRecycleNotes = {};
+  let customLines = null, customRatio = 1;
   if(editing.order){
     orderId = editing.order;
     const ord = state.orders.find(o=>o.id===orderId);
+    if(ord && ord.custom && ord.productId===productId){ customLines = state.nvlTx.filter(t=>t.orderId===orderId && t.source==='production' && t.type==='out').map(t=>({...t})); customRatio = Number(ord.qty)>0 ? qty/Number(ord.qty) : 1; }
     if(ord){ ord.productId = productId; ord.qty = qty; ord.date = date; ord.note = note; }
     state.nvlTx.filter(t=>t.orderId===orderId && t.source==='production').forEach(t=>{ if(t.note) preservedProductionNotes[t.materialId] = t.note; });
     state.nvlTx.filter(t=>t.orderId===orderId && t.source==='manual_extra').forEach(t=>{ if(t.note) preservedExtraNotes[t.materialId] = t.note; });
@@ -4121,7 +4155,10 @@ function addOrder(month){
     state.productTx.push({id: uid(), productId, type:'in', qty: rawKg, date, note: note||'Nhập từ sản xuất', source:'production', orderId, packingId: null, packQty: null});
   }
   const bomLines = state.bom[productId] || [];
-  if(!bomLines.length && !orderExtraLines.length){
+  if(customLines && customLines.length){
+    customLines.forEach(l=>{ state.nvlTx.push({...l, id: uid(), date, qty: l.qty*customRatio}); });
+    { const od2=state.orders.find(o=>o.id===orderId); if(od2) od2.custom=true; }
+  } else if(!bomLines.length && !orderExtraLines.length){
     alert('Lưu ý: sản phẩm này chưa có định mức, hệ thống chỉ nhập kho thành phẩm, không trừ NVL.');
   } else {
     bomLines.forEach(l=>{
@@ -5376,7 +5413,7 @@ loadState();
 <script id="sx-sync">
 /* ===== Kho chung SX (noibobaocao4) — đồng bộ điện thoại ===== */
 (function(){
-  var URL_='https://script.google.com/macros/s/AKfycbwHGLF2TV2agyWYzBQLFIZrcCn_jJBYe3ZBB7YBFJ36NhB571YumewOXSPsIvmVBF4AIw/exec', KEY_=window.__SX_LOADER_KEY||'', APP_VER='2026-11-27-9';
+  var URL_='https://script.google.com/macros/s/AKfycbwHGLF2TV2agyWYzBQLFIZrcCn_jJBYe3ZBB7YBFJ36NhB571YumewOXSPsIvmVBF4AIw/exec', KEY_=window.__SX_LOADER_KEY||'', APP_VER='2026-11-27-10';
   var PHONE=!!window.__SX_LOADER_KEY, remoteAt=0, busy=false, pushT=null, st='';
   function badge(t,c){ try{ var el=document.getElementById('sxCloud'); if(!el){ var b=document.getElementById('fileDirtyBadge'); if(!b) return; el=document.createElement('span'); el.id='sxCloud'; el.style.cssText='margin-left:8px;font-weight:700;'; b.parentNode.insertBefore(el,b.nextSibling); if(PHONE) b.style.display='none'; } el.textContent=t; el.style.color=c||'#4B7A51'; }catch(e){} }
   function q(a){ return URL_+'?k='+encodeURIComponent(KEY_)+'&a='+a+'&_='+Date.now(); }
