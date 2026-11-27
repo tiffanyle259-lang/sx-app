@@ -1888,7 +1888,7 @@ function autoPanel(){
     ${q0==='granted'?`<button class="btn go" onclick="autoTick(true)">Cập nhật ngay</button>`:st.qlbh==='prompt'?`<button class="btn go" onclick="autoGrant()">Cho phép</button>`:`<button class="btn go" onclick="autoConnect('qlbh')">Nối file QLBH</button>`}</div>
   <div class="bh-task ${st.app==='granted'?'ok':'warn'}"><span class="tg">💾</span><div class="tx"><b>Tự lưu vào file app này ${pill(st.app)}</b><span>${st.app==='granted'?'Mọi thay đổi tự ghi vào file, không cần bấm Lưu.'+(st.lastSave?' Lần cuối '+new Date(st.lastSave).toLocaleTimeString('vi-VN'):''):'Nối file quan-ly-san-xuat.html này một lần để app tự lưu.'}</span></div>
     ${st.app==='granted'?'':st.app==='prompt'?`<button class="btn go" onclick="autoGrant()">Cho phép</button>`:`<button class="btn go" onclick="autoConnect('app')">Nối file app</button>`}</div>
-  ${window.__SX_LOADER_KEY?'':`<div class="bh-task ${(function(){try{return localStorage.getItem('sx-appver')==='2026-11-27-14'}catch(e){return false}})()?'ok':'warn'}"><span class="tg">📱</span><div class="tx"><b>App trên điện thoại</b><span>Điện thoại mở bản đã đẩy lên kho. Sửa app xong thì bấm đẩy để điện thoại có bản mới (chọn file quan-ly-san-xuat.html).</span></div><button class="btn go" onclick="sxUploadApp()">Đẩy lên điện thoại</button></div>`}
+  ${window.__SX_LOADER_KEY?'':`<div class="bh-task ${(function(){try{return localStorage.getItem('sx-appver')==='2026-11-27-15'}catch(e){return false}})()?'ok':'warn'}"><span class="tg">📱</span><div class="tx"><b>App trên điện thoại</b><span>Điện thoại mở bản đã đẩy lên kho. Sửa app xong thì bấm đẩy để điện thoại có bản mới (chọn file quan-ly-san-xuat.html).</span></div><button class="btn go" onclick="sxUploadApp()">Đẩy lên điện thoại</button></div>`}
   <div class="bh-task ok"><span class="tg">🛟</span><div class="tx"><b>Sao lưu tự động (${bk.length}/3 bản gần nhất)</b><span>${bk.length?bk.map((b,i)=>`<a href="#" onclick="autoRestoreBackup(${i});return false" style="color:#6B3F08;font-weight:700">${new Date(b.t).toLocaleString('vi-VN')}</a> (${esc(b.why)})`).join(' · '):'Chưa có bản sao lưu'}</span></div></div>
   <div class="bh-note">Lần đầu mỗi ngày Chrome có thể hỏi quyền truy cập file: chọn <b>"Cho phép trong mọi lần truy cập"</b> để app tự chạy cả ngày.</div></div>`;
 }
@@ -3611,14 +3611,14 @@ function renderTonKho(){
   const tpOutThisYear = state.productTx.filter(t=>t.date>=yearStart && t.date<yearEndExclusive && t.type==='out').length;
 
   const recentOrders = [...state.orders].sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id)).slice(0,8);
-  const recentOrderPackCols = orderPackagingColumns();
+  const recentOrderPackCols = orderPackagingColumns().filter(c=>c.key!=='raw');
   const recentOrderTotalCols = 5 + recentOrderPackCols.length;
   const recentOrderRows = recentOrders.length ? recentOrders.map(o=>`
     <tr>
-      <td style="text-align:left;white-space:nowrap">${o.date.split('-').reverse().join('/')}</td>
-      <td style="width:90px">${esc(productName(o.productId))}</td>
+      <td style="text-align:left;white-space:nowrap;padding:7px 8px 11px">${pill3d(o.date.slice(8,10)+'/'+o.date.slice(5,7),'date')}</td>
+      <td style="width:90px;padding:7px 8px 11px">${pill3d(esc(productName(o.productId)),'name')}</td>
       ${recentOrderPackCols.map(c=>`<td class="num">${orderColumnValue(o,c.key)}</td>`).join('')}
-      <td class="num" style="font-weight:600">${fmt(o.qty)}</td>
+      <td class="num" style="font-weight:600;padding:7px 8px 11px">${pill3d(fmt(o.qty)+' kg','qty')}</td>
       <td>${esc(o.note||'')}</td>
     </tr>`).join('') : `<tr class="empty-row"><td colspan="${recentOrderTotalCols}">Chưa có lệnh sản xuất nào.</td></tr>`;
 
@@ -3737,16 +3737,20 @@ function renderTonKho(){
 }
 
 /* --- Production orders --- */
+function pill3d(txt,kind){
+  const c={name:['#DDF7F0','#92DCCB','#6FC7B4','#4FA896','rgba(20,90,80,.22)'],qty:['#E0EEFF','#9DC5F6','#7AA9E6','#5B88C4','rgba(30,60,120,.22)'],date:['#FFF3CC','#F8D77F','#E6BE5C','#C99B2E','rgba(110,80,0,.22)']}[kind];
+  return `<span style="display:block;padding:6px 10px;border-radius:12px;background:linear-gradient(180deg,${c[0]},${c[1]});border:1px solid ${c[2]};box-shadow:0 4px 0 ${c[3]},0 7px 10px ${c[4]};font-size:16px;font-weight:900;color:#000;text-align:center;white-space:nowrap">${txt}</span>`;
+}
 function renderOrdersPanel(month, monthStart, monthEndExclusive){
   const orders = state.orders.filter(o=>o.date>=monthStart && o.date<monthEndExclusive).sort((a,b)=>b.date.localeCompare(a.date));
-  const packCols = orderPackagingColumns();
+  const packCols = orderPackagingColumns().filter(c=>c.key!=='raw');
   const totalCols = 6 + packCols.length;
   const rows = orders.length ? orders.map(o=>`
     <tr>
-      <td class="num" style="text-align:left;white-space:nowrap">${o.date.split('-').reverse().join('/')}</td>
-      <td style="width:90px">${esc(productName(o.productId))}${orderPending(o)?`<div><button type="button" class="btn go" style="padding:3px 8px;font-size:11px;white-space:nowrap" onclick="toggleOrderDetail('${o.id}')" title="Tick từng NVL đã cân, rồi bấm Xác nhận đã cân xong">⚖ Chưa cân xong</button></div>`:(o.done?`<div style="font-size:10.5px;color:#2E6B37;font-weight:700">✔ Đã SX${o.doneAt?' '+isoToVN(o.doneAt).slice(0,5):''}</div>`:'')}</td>
+      <td class="num" style="text-align:left;white-space:nowrap;padding:7px 8px 11px">${pill3d(o.date.slice(8,10)+'/'+o.date.slice(5,7),'date')}</td>
+      <td style="width:90px;padding:7px 8px 11px">${pill3d(esc(productName(o.productId)),'name')}${orderPending(o)?`<div><button type="button" class="btn go" style="padding:3px 8px;font-size:11px;white-space:nowrap" onclick="toggleOrderDetail('${o.id}')" title="Tick từng NVL đã cân, rồi bấm Xác nhận đã cân xong">⚖ Chưa cân xong</button></div>`:(o.done?`<div style="font-size:10.5px;color:#2E6B37;font-weight:700">✔ Đã SX${o.doneAt?' '+isoToVN(o.doneAt).slice(0,5):''}</div>`:'')}</td>
       ${packCols.map(c=>`<td class="num">${orderColumnValue(o,c.key)}</td>`).join('')}
-      <td class="num" style="font-weight:600">${fmt(o.qty)}</td>
+      <td class="num" style="font-weight:600;padding:7px 8px 11px">${pill3d(fmt(o.qty)+' kg','qty')}</td>
       <td class="num">${fmt(orderNvlCost(o.id))}</td>
       <td>${isOrderLocked(o.id)?'<span title="Lệnh đã chốt — không sửa/xoá được, bấm 🔓 để mở khoá" style="color:#B9601E;font-weight:600">🔒 </span>':''}${esc(o.note||'')}</td>
       <td class="num row-actions"><button class="btn-edit" onclick="toggleOrderDetail('${o.id}')" title="Xem chi tiết NVL">👁</button>${isOrderLocked(o.id)
@@ -5417,7 +5421,7 @@ loadState();
 <script id="sx-sync">
 /* ===== Kho chung SX (noibobaocao4) — đồng bộ điện thoại ===== */
 (function(){
-  var URL_='https://script.google.com/macros/s/AKfycbwHGLF2TV2agyWYzBQLFIZrcCn_jJBYe3ZBB7YBFJ36NhB571YumewOXSPsIvmVBF4AIw/exec', KEY_=window.__SX_LOADER_KEY||'', APP_VER='2026-11-27-14';
+  var URL_='https://script.google.com/macros/s/AKfycbwHGLF2TV2agyWYzBQLFIZrcCn_jJBYe3ZBB7YBFJ36NhB571YumewOXSPsIvmVBF4AIw/exec', KEY_=window.__SX_LOADER_KEY||'', APP_VER='2026-11-27-15';
   var PHONE=!!window.__SX_LOADER_KEY, remoteAt=0, busy=false, pushT=null, st='';
   function badge(t,c){ try{ var el=document.getElementById('sxCloud'); if(!el){ var b=document.getElementById('fileDirtyBadge'); if(!b) return; el=document.createElement('span'); el.id='sxCloud'; el.style.cssText='margin-left:8px;font-weight:700;'; b.parentNode.insertBefore(el,b.nextSibling); if(PHONE) b.style.display='none'; } el.textContent=t; el.style.color=c||'#4B7A51'; }catch(e){} }
   function q(a){ return URL_+'?k='+encodeURIComponent(KEY_)+'&a='+a+'&_='+Date.now(); }
